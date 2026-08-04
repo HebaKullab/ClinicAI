@@ -1,0 +1,1442 @@
+[
+{
+    "id": 1,
+    "input": "أشعر ببعض الوجع في الظهر بعد الجلوس طويلاً.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 2,
+    "input": "فحص دوري.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 3,
+    "input": "استشارة عامة عن العناية بالبشرة.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 4,
+    "input": "فحص روتيني لكبار السن.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 5,
+    "input": "استشارة بخصوص أعراض بسيطة.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 6,
+    "input": "والدي المسن يحتاج لفحص دوري.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 7,
+    "input": "ألم في الصدر مع صعوبة في البلع.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 8,
+    "input": "فحص روتيني في عيادة النساء.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 9,
+    "input": "وقعت على ظهري وأشعر بألم شديد جداً.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 10,
+    "input": "لدي اضطرابات في الدورة الشهرية.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 11,
+    "input": "جدتي عمرها 75 سنة وتحتاج لمتابعة عامة.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 12,
+    "input": "بدي متابعة للضغط لأن القراءات عندي بالأيام الأخيرة صارت فوق 160 على 100.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 13,
+    "input": "أعاني من كحة خفيفة وإرهاق.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 14,
+    "input": "هبوط سكر حاد وأشعر بدوخة شديدة.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 15,
+    "input": "لدي إسهال حاد مع جفاف شديد.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 16,
+    "input": "احمرار في الجلد مع حكة خفيفة.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 17,
+    "input": "ولادة مبكرة وأحتاج لرعاية عاجلة.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 18,
+    "input": "حرقة معدة مستمرة بعد الأكل.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 19,
+    "input": "أعاني من قولون عصبي ومغص متكرر.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 20,
+    "input": "صدفية متفاقمة وتغطي مساحات كبيرة من الجلد.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 21,
+    "input": "فحص مهبلي روتيني.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 22,
+    "input": "دوخة بسيطة عند الوقوف.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 23,
+    "input": "فحص روتيني لمفاصلي.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 24,
+    "input": "اشتباه في تسمم غذائي مع غثيان وترجيع.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 25,
+    "input": "فحص عام للأعصاب.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 26,
+    "input": "متابعة لحالة جلدية بسيطة.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 27,
+    "input": "ارتفاع سكر خفيف وأحتاج لتعديل جرعة الأنسولين.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 28,
+    "input": "أعاني من التهاب جلدي حاد مع تقرحات.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 29,
+    "input": "تجديد وصفة أدوية الضغط.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 30,
+    "input": "ألم خفيف في البطن.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 31,
+    "input": "بدي متابعة للضغط لأن القراءات عندي بالأيام الأخيرة صارت فوق 180 على 110.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 32,
+    "input": "فحص عام بسبب شعور بالتعب.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 33,
+    "input": "لدي تشوش في الكلام وفقدان توازن أحياناً.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 34,
+    "input": "أحتاج لمتابعة روتينية لأعصابي.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 35,
+    "input": "قشرة جلدية شديدة في فروة الرأس.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 36,
+    "input": "والدتي المسنة عمرها 68 سنة وتحتاج لفحص روتيني.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 37,
+    "input": "أشعر بوهن عام.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 38,
+    "input": "أشعر بتنميل مستمر في الأطراف ورعشة خفيفة.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 39,
+    "input": "مراجعة عامة للعظام.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 40,
+    "input": "دوخة خفيفة مع شعور بالوهن.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 41,
+    "input": "عندي سكري وبدي فحص روتيني للسكر التراكمي بعدين.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 42,
+    "input": "استشارة بخصوص آلام الرأس الخفيفة.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 43,
+    "input": "إمساك مزمن وأحتاج لحل.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 44,
+    "input": "أحتاج لمتابعة حمل روتينية.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 45,
+    "input": "أشعر بانتفاخ خفيف في البطن أحياناً.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 46,
+    "input": "أعاني من كحة قوية جداً مع ضيق في التنفس.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 47,
+    "input": "مراجعة عامة للمعدة.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 48,
+    "input": "كولسترول مرتفع جداً مع آلام في الصدر.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 49,
+    "input": "الم شديد في البطن للحامل مع تقلصات.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 50,
+    "input": "أصبت بجلطة دماغية قبل قليل وفقدت القدرة على الكلام.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 51,
+    "input": "مشاكل حمل خطيرة وأحتاج لمتابعة فورية.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 52,
+    "input": "بقعة صغيرة على الجلد أريد فحصها.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 53,
+    "input": "والدي المسن يعاني من نسيان خفيف.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 54,
+    "input": "مراجعة عامة للصحة.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 55,
+    "input": "فحص عام للصحة الإنجابية.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 56,
+    "input": "كبير سن يعاني من ضعف عام ولا يستطيع الاعتناء بنفسه.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 57,
+    "input": "مغص قوي جداً لا يهدأ مع انتفاخ كبير في البطن.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 58,
+    "input": "شرى حاد مع صعوبة في التنفس.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 59,
+    "input": "لدي غدة درقية وأحتاج لتعديل الأدوية.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 60,
+    "input": "أحتاج لمتابعة لعمودي الفقري.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 61,
+    "input": "جدتي عمرها 90 سنة وأصيبت باختلاط أدوية خطير.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 62,
+    "input": "ألم خفيف في البطن خلال الدورة.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 63,
+    "input": "استشارة بخصوص ألم خفيف في الركبة.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 64,
+    "input": "نزيف من الجهاز الهضمي وأحتاج لمتابعة عاجلة.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 65,
+    "input": "دوخة شديدة مع تنميل في الوجه والأطراف.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 66,
+    "input": "لدي بواسير مؤلمة وأحتاج لعلاج.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 67,
+    "input": "جدي عمره 65 سنة ويحتاج لمتابعة لأدوية الضغط.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 68,
+    "input": "استشارة بخصوص مشاكل نسائية عامة.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 69,
+    "input": "متابعة لمرض مزمن وأشعر ببعض التعب.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 70,
+    "input": "أشعر بألم في المبيض وأحتاج لفحص.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 71,
+    "input": "عندي صداع شديد جداً مع شلل في الجانب الأيسر من الجسم.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 72,
+    "input": "أعاني من ألم مزمن في الظهر والرقبة.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 73,
+    "input": "كبير سن يعاني من وهن عام.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 74,
+    "input": "حساسية جلدية شديدة تسببت في تورم الوجه.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 75,
+    "input": "التواء شديد في الركبة مع تورم كبير.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 76,
+    "input": "والدتي المسنة عمرها 78 سنة وتعرضت لسقوط مفاجئ.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 77,
+    "input": "لدي حمى شديدة جداً مع آلام في الجسم.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 78,
+    "input": "استشارة بخصوص حب الشباب.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 79,
+    "input": "فحص روتيني للجهاز الهضمي.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 80,
+    "input": "فحص روتيني للضغط.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 81,
+    "input": "أعاني من أزمة ربو حادة وأحتاج لمساعدة.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 82,
+    "input": "فحص روتيني عام.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 83,
+    "input": "متابعة عامة لجدتي.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 84,
+    "input": "زكام حاد مع إرهاق شديد.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 85,
+    "input": "ألم خفيف في الكتف.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 86,
+    "input": "استشارة بخصوص تنظيم الأسرة.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 87,
+    "input": "استشارة بخصوص الكولسترول.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 88,
+    "input": "أعاني من نوبات صرع متكررة وأحتاج لمتابعة.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 89,
+    "input": "الم عضلي شديد بعد مجهود.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 90,
+    "input": "والدي المسن عمره 85 سنة ويعاني من خرف شديد وفقدان ذاكرة حاد.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 91,
+    "input": "أعاني من ألم معدة شديد جداً مع ترجيع مستمر.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 92,
+    "input": "الم مفصل الورك لا يحتمل ولا أستطيع الحركة.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 93,
+    "input": "أعاني من أكزيما مزمنة وأحتاج لمتابعة.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 94,
+    "input": "جدي عمره 70 سنة ويعاني من صعوبة في التنفس.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 95,
+    "input": "أحتاج لاستشارة بخصوص جفاف الجلد.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 96,
+    "input": "عندي السكر صار عالي اليوم ووصل تقريباً 310 ومعه عطش كثير وتبول متكرر.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 97,
+    "input": "لدي ألم في الركبة يزداد عند صعود الدرج.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 98,
+    "input": "ألم في منطقة الكبد مع تعب عام.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 99,
+    "input": "أشعر بوجع في عظامي ومفاصلي.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 100,
+    "input": "أنا حامل وأعاني من نزيف رحمي شديد.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 101,
+    "input": "أشعر بتنميل خفيف في يدي أحياناً.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 102,
+    "input": "استشارة بخصوص رعاية مسن.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 103,
+    "input": "مراجعة عامة لأعراض بسيطة.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 104,
+    "input": "لدي حمى خفيفة وزكام.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 105,
+    "input": "ألم في الأعصاب مع ضعف عام.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 106,
+    "input": "تعرضت لكسر في الساق ولا أستطيع المشي.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 107,
+    "input": "استشارة بخصوص عسر الهضم.",
+    "expected": {
+        "Clinic": "gastroenterology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gastroenterology"
+},
+{
+    "id": 108,
+    "input": "استشارة بخصوص التغذية لكبار السن.",
+    "expected": {
+        "Clinic": "elderly",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "elderly"
+},
+{
+    "id": 109,
+    "input": "تجديد وصفة أدوية الربو.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 110,
+    "input": "فحص روتيني للجلد.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 111,
+    "input": "أحتاج لكشف روتيني.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 112,
+    "input": "لدي آلام رحم قوية جداً ومخاوف على الحمل.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "gynecology"
+},
+{
+    "id": 113,
+    "input": "تمزق وتر الكتف وأحتاج لتدخل عاجل.",
+    "expected": {
+        "Clinic": "orthopedics",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "orthopedics"
+},
+{
+    "id": 114,
+    "input": "لدي طفح جلدي منتشر في كل الجسم مع حكة شديدة وحرارة.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 115,
+    "input": "لدي بقع جلدية غريبة تظهر وتختفي.",
+    "expected": {
+        "Clinic": "dermatology",
+        "Priority": "P2"
+    },
+    "urgency_score": 0.55,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-17"},
+    "specialty_hint": "dermatology"
+},
+{
+    "id": 116,
+    "input": "أشعر بوهن عام وعدم قدرة على الحركة.",
+    "expected": {
+        "Clinic": "general_practice",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "general_practice"
+},
+{
+    "id": 117,
+    "input": "تعرضت لإغماء مفاجئ وتشنجات قوية.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 118,
+    "input": "أعاني من ضعف مفاجئ في الأطراف وصعوبة في النطق.",
+    "expected": {
+        "Clinic": "neurology",
+        "Priority": "P1"
+    },
+    "urgency_score": 0.9,
+    "is_followup": false,
+    "time_pref": {"date": "2026-07-15"},
+    "specialty_hint": "neurology"
+},
+{
+    "id": 119,
+    "input": "متابعة عامة للأمراض المزمنة.",
+    "expected": {
+        "Clinic": "chronic_diseases",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "chronic_diseases"
+},
+{
+    "id": 120,
+    "input": "متابعة بعد الولادة.",
+    "expected": {
+        "Clinic": "gynecology",
+        "Priority": "P3"
+    },
+    "urgency_score": 0.25,
+    "is_followup": true,
+    "time_pref": {"date": "2026-07-22"},
+    "specialty_hint": "gynecology"
+}
+]

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}جدول الـ Slots{% endblock %}
+{% block content %}
+<div class="page-title">🕒 Slots الأطباء</div>
+<div class="page-sub">
+  {{ display_date }}
+  {% if selected_doctor %} — {{ selected_doctor.name }} / {{ selected_doctor.clinic_name }}{% endif %}
+</div>
+
+<div class="date-nav">
+  <a href="/slots?day={{ prev_date }}{% if doctor_id %}&doctor_id={{ doctor_id }}{% endif %}">‹ السابق</a>
+  <span>{{ display_date }}</span>
+  <a href="/slots?day={{ next_date }}{% if doctor_id %}&doctor_id={{ doctor_id }}{% endif %}">التالي ›</a>
+</div>
+
+<div class="card" style="margin-bottom:16px;padding:16px 20px;overflow:visible">
+  <form method="get" action="/slots" style="display:flex;gap:12px;align-items:end;flex-wrap:wrap">
+    <input type="hidden" name="day" value="{{ target_date }}" />
+    <label style="min-width:260px">الطبيب / العيادة
+      <select name="doctor_id" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px">
+        <option value="">كل الأطباء</option>
+        {% for doctor in doctors %}
+        <option value="{{ doctor.doctor_id }}" {% if doctor_id == doctor.doctor_id %}selected{% endif %}>
+          {{ doctor.name }} — {{ doctor.clinic_name }}
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-primary" type="submit">عرض</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Slot ID</th>
+        <th>الوقت</th>
+        <th>الطبيب</th>
+        <th>العيادة</th>
+        <th>الأولوية المحجوزة</th>
+        <th>الحالة</th>
+        <th>المريض</th>
+        <th>رقم الموعد</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for slot in slots %}
+      <tr>
+        <td>#{{ slot.slot_id }}</td>
+        <td>{{ slot.slot_datetime.strftime('%H:%M') }}</td>
+        <td>{{ slot.doctor.name if slot.doctor else '—' }}</td>
+        <td>{{ slot.doctor.clinic_name if slot.doctor else '—' }}</td>
+        <td>{{ slot.priority_class or 'عام' }}</td>
+        <td class="status-{{ 'confirmed' if slot.status == 'booked' else 'completed' }}">{{ slot.status }}</td>
+        <td>{{ slot.appointment.patient.name if slot.appointment and slot.appointment.patient else '—' }}</td>
+        <td>{{ slot.appointment.appt_id if slot.appointment else '—' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="empty">لا توجد Slots في هذا اليوم</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

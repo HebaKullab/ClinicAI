@@ -58,9 +58,13 @@ def _load(name):
 
 
 def _name(t):
-    for p in [r"المريض\s+(?:اسمه\s+)?(\S+\s+\S+)", r"اسم المريض\s+(\S+\s+\S*)"]:
+    for p in [
+        r"المريض\s+(?:اسمه\s+)?(\S+(?:\s+\S+){0,3})",
+        r"اسم المريض\s+(\S+(?:\s+\S+){0,3})",
+    ]:
         m = re.search(p, t)
-        if m: return m.group(1).strip()
+        if m:
+            return m.group(1).strip().rstrip("،,")
     return None
 
 

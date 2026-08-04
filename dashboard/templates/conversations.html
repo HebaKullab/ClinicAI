@@ -11,8 +11,10 @@ content %}
     <thead>
       <tr>
         <th>المعرف</th>
-        <th>الاسم</th>
+        <th>المريض المرتبط</th>
+        <th>اسم تيليجرام</th>
         <th>المستخدم</th>
+        <th>الدور</th>
         <th>آخر تحديث</th>
         <th>فتح</th>
       </tr>
@@ -22,10 +24,19 @@ content %}
       <tr>
         <td>{{ conversation.telegram_id }}</td>
         <td>
+          {% if conversation.patient %}
+            {{ conversation.patient.name or "مريض بدون اسم" }}
+            <span class="badge">#{{ conversation.patient.patient_id }}</span>
+          {% else %}
+            غير مربوط بعد
+          {% endif %}
+        </td>
+        <td>
           {{ conversation.first_name or "—" }} {{ conversation.last_name or ""
           }}
         </td>
         <td>{{ conversation.username or "—" }}</td>
+        <td>{{ conversation.role or "—" }}</td>
         <td>
           {{ conversation.updated_at.strftime('%Y-%m-%d %H:%M') if
           conversation.updated_at else "—" }}
@@ -40,7 +51,7 @@ content %}
       </tr>
       {% else %}
       <tr>
-        <td colspan="5" class="empty">لا توجد محادثات بعد</td>
+        <td colspan="7" class="empty">لا توجد محادثات بعد</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -49,7 +60,10 @@ content %}
 
 {% if selected %}
 <div class="card">
-  <div class="card-header">سجل المحادثة: {{ selected.telegram_id }}</div>
+  <div class="card-header">
+    سجل المحادثة: {{ selected.telegram_id }}
+    {% if selected.patient %} · المريض: {{ selected.patient.name or "بدون اسم" }}{% endif %}
+  </div>
   <div style="padding: 12px 16px">
     <div class="chat-container">
       {% for msg in messages|reverse %}

@@ -328,6 +328,16 @@
         >📅 المواعيد</a
       >
       <a
+        href="/doctors"
+        class="{% if '/doctors' in request.url.path %}active{% endif %}"
+        >👨‍⚕️ الأطباء والعيادات</a
+      >
+      <a
+        href="/slots"
+        class="{% if '/slots' in request.url.path %}active{% endif %}"
+        >🕒 الـ Slots</a
+      >
+      <a
         href="/sessions"
         class="{% if '/sessions' in request.url.path %}active{% endif %}"
         >🩺 الجلسات</a
@@ -366,13 +376,15 @@
         <td>${a.time}</td>
         <td>${a.patient_name}</td>
         <td>${a.specialty || "—"}</td>
+        <td>${a.doctor_name || "—"}<br><small>${a.clinic_name || "—"}</small></td>
+        <td title="${a.complaint || ""}">${a.complaint || "—"}</td>
         <td><span class="badge badge-${a.priority_class}">${
           a.priority_class === "P1"
             ? "🔴 عاجل"
             : a.priority_class === "P2"
               ? "🟡 متوسط"
               : "🟢 روتيني"
-        }</span></td>
+        }</span>${a.priority_score !== null && a.priority_score !== undefined ? ` <small>${Number(a.priority_score).toFixed(2)}</small>` : ""}</td>
         <td class="status-${a.status}">${
           a.status === "confirmed"
             ? "مؤكد"
@@ -382,18 +394,21 @@
                 ? "غياب"
                 : a.status === "cancelled"
                   ? "ملغي"
-                  : a.status
+                  : a.status === "waitlisted"
+                    ? "قائمة انتظار"
+                    : a.status
         }</td>
         <td>
           <button class="btn btn-primary btn-sm"
             onclick="setStatus('${a.appt_id}','completed')">✓ حضر</button>
           <button class="btn btn-sm" style="background:#333;color:#fff;margin-right:4px"
             onclick="setStatus('${a.appt_id}','no_show')">✗ غاب</button>
+          <a class="btn btn-sm" style="margin-right:4px" href="/sessions?appointment_id=${a.appt_id}#new-session">🩺 جلسة</a>
         </td>
       </tr>`,
             )
             .join("") ||
-          '<tr><td colspan="6" class="empty">لا توجد مواعيد</td></tr>';
+          '<tr><td colspan="8" class="empty">لا توجد مواعيد</td></tr>';
       }
 
       async function setStatus(apptId, status) {

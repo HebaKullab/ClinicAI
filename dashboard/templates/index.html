@@ -45,6 +45,8 @@
         <th>الوقت</th>
         <th>المريض</th>
         <th>التخصص</th>
+        <th>الطبيب / العيادة</th>
+        <th>الشكوى</th>
         <th>الأولوية</th>
         <th>الحالة</th>
         <th>إجراء</th>
@@ -55,29 +57,39 @@
       <tr>
         <td>{{ a.appt_datetime.strftime("%H:%M") if a.appt_datetime else "—" }}</td>
         <td>{{ a.patient.name if a.patient else "—" }}</td>
-        <td>{{ a.specialty or "—" }}</td>
+        <td>{{ a.specialty_ar or a.specialty or "—" }}</td>
+        <td>
+          {% if a.slot and a.slot.doctor %}
+            {{ a.slot.doctor.name }}<br><small>{{ a.slot.doctor.clinic_name }}</small>
+          {% else %}—{% endif %}
+        </td>
+        <td title="{{ a.complaint_summary or '' }}">{{ a.complaint_summary or "—" }}</td>
         <td>
           <span class="badge badge-{{ a.priority_class }}">
             {% if a.priority_class == "P1" %}🔴 عاجل
             {% elif a.priority_class == "P2" %}🟡 متوسط
             {% else %}🟢 روتيني{% endif %}
           </span>
+          {% if a.priority_score is not none %}<small> {{ '%.2f'|format(a.priority_score) }}</small>{% endif %}
         </td>
         <td class="status-{{ a.status }}">
           {% if a.status == "confirmed" %}مؤكد
           {% elif a.status == "completed" %}مكتمل
           {% elif a.status == "no_show" %}غياب
-          {% else %}ملغي{% endif %}
+          {% elif a.status == "waitlisted" %}قائمة انتظار
+          {% elif a.status == "cancelled" %}ملغي
+          {% else %}{{ a.status }}{% endif %}
         </td>
         <td>
           <button class="btn btn-primary btn-sm"
             onclick="setStatus('{{ a.appt_id }}','completed')">✓ حضر</button>
           <button class="btn btn-sm" style="background:#333;color:#fff;margin-right:4px"
             onclick="setStatus('{{ a.appt_id }}','no_show')">✗ غاب</button>
+          <a class="btn btn-sm" style="margin-right:4px" href="/sessions?day={{ a.appt_datetime.date().isoformat() if a.appt_datetime else '' }}&appointment_id={{ a.appt_id }}#new-session">🩺 جلسة</a>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="6" class="empty">لا توجد مواعيد اليوم</td></tr>
+      <tr><td colspan="8" class="empty">لا توجد مواعيد اليوم</td></tr>
       {% endfor %}
     </tbody>
   </table>

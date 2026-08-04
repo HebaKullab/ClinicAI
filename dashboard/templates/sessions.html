@@ -1,7 +1,8 @@
-{% extends "base.html" %} {% block title %}الجلسات{% endblock %} {% block
-content %}
+{% extends "base.html" %}
+{% block title %}الجلسات{% endblock %}
+{% block content %}
 <div class="page-title">🩺 سجلات الجلسات</div>
-<div class="page-sub">{{ display_date }}</div>
+<div class="page-sub">{{ display_date }} — تسجيل الجلسة يتم من الموعد نفسه، بدون الحاجة إلى Telegram ID للطبيب.</div>
 
 <div class="date-nav">
   <a href="/sessions?day={{ prev_date }}">‹ السابق</a>
@@ -9,95 +10,155 @@ content %}
   <a href="/sessions?day={{ next_date }}">التالي ›</a>
 </div>
 
-{% if sessions %} {% for s in sessions %}
-<div class="card" style="margin-bottom: 16px">
+<div id="new-session" class="card" style="margin-bottom:20px;overflow:visible">
+  <div class="card-header">➕ تسجيل جلسة جديدة من موعد محجوز</div>
+  <form id="session-form" style="padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <label style="grid-column:1 / -1">الموعد
+      <select id="appointment_id" required style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px">
+        <option value="">اختاري/اختر الموعد</option>
+        {% for a in candidates %}
+        <option
+          value="{{ a.appt_id }}"
+          data-complaint="{{ a.complaint_summary or '' }}"
+          data-doctor="{{ a.slot.doctor.name if a.slot and a.slot.doctor else '' }}"
+          data-clinic="{{ a.slot.doctor.clinic_name if a.slot and a.slot.doctor else '' }}"
+          {% if selected_appointment and selected_appointment.appt_id == a.appt_id %}selected{% endif %}
+        >
+          {{ a.appt_datetime.strftime('%H:%M') if a.appt_datetime else '—' }} —
+          {{ a.patient.name if a.patient else 'مريض غير معروف' }} —
+          {{ a.slot.doctor.name if a.slot and a.slot.doctor else 'بدون طبيب' }} —
+          {{ a.slot.doctor.clinic_name if a.slot and a.slot.doctor else 'بدون عيادة' }}
+        </option>
+        {% endfor %}
+      </select>
+      <small id="doctor-hint" style="display:block;color:var(--muted);margin-top:5px"></small>
+    </label>
+
+    <label>الشكوى
+      <textarea id="chief_complaint" rows="3" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px"></textarea>
+    </label>
+    <label>التشخيص
+      <textarea id="diagnosis" rows="3" required style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px"></textarea>
+    </label>
+    <label>الأدوية <small style="color:var(--muted)">(افصلي بينها بفاصلة)</small>
+      <textarea id="medications" rows="2" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px"></textarea>
+    </label>
+    <label>الفحوصات <small style="color:var(--muted)">(افصلي بينها بفاصلة)</small>
+      <textarea id="investigations" rows="2" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px"></textarea>
+    </label>
+    <label>المتابعة بعد كم يوم؟
+      <input id="followup_days" type="number" min="0" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px" />
+    </label>
+    <label>الملاحظات الأصلية / التفريغ الصوتي
+      <textarea id="raw_transcription" rows="2" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:6px"></textarea>
+    </label>
+
+    <div style="grid-column:1 / -1;display:flex;gap:10px;align-items:center">
+      <button class="btn btn-primary" type="submit">حفظ الجلسة وربطها بالموعد</button>
+      <span id="session-result" style="font-size:.85rem"></span>
+    </div>
+  </form>
+  {% if not candidates %}
+  <div class="empty" style="padding:20px">لا توجد مواعيد قابلة لتسجيل جلسة لها في هذا اليوم، أو تم تسجيل جلساتها مسبقًا.</div>
+  {% endif %}
+</div>
+
+{% if sessions %}
+{% for s in sessions %}
+<div class="card" style="margin-bottom:16px">
   <div class="card-header">
-    👤 {{ s.patient_name or "مريض غير معروف" }}
-    <span style="color: var(--muted); font-size: 0.8rem">
-      {{ s.session_datetime.strftime("%H:%M") }}
-    </span>
+    👤 {{ s.patient.name if s.patient else (s.patient_name or "مريض غير معروف") }}
+    <span style="color:var(--muted);font-size:.8rem">{{ s.session_datetime.strftime("%H:%M") }}</span>
   </div>
-  <div
-    style="
-      padding: 16px 20px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    "
-  >
+
+  <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    {% if s.patient %}<span class="badge">Patient #{{ s.patient.patient_id }}</span>{% else %}<span class="badge">غير مربوط بمريض</span>{% endif %}
+    {% if s.appointment %}
+      <span class="badge">موعد #{{ s.appointment.appt_id }}</span>
+      <span class="badge">{{ s.appointment.status }}</span>
+      {% if s.appointment.appt_datetime %}<span class="badge">{{ s.appointment.appt_datetime.strftime("%H:%M") }}</span>{% endif %}
+      {% if s.appointment.slot %}<span class="badge">Slot #{{ s.appointment.slot.slot_id }}</span>{% endif %}
+    {% else %}<span class="badge">بدون موعد مرتبط</span>{% endif %}
+    {% if s.doctor %}
+      <span class="badge">الطبيب: {{ s.doctor.name }}</span>
+      <span class="badge">{{ s.doctor.clinic_name }}</span>
+      <span class="badge">{{ s.doctor.clinic_code }}</span>
+    {% endif %}
+  </div>
+
+  <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div><div style="color:var(--muted);font-size:.75rem;margin-bottom:4px">الشكوى</div><div>{{ s.chief_complaint or (s.appointment.complaint_summary if s.appointment else "—") }}</div></div>
+    <div><div style="color:var(--muted);font-size:.75rem;margin-bottom:4px">التشخيص</div><div>{{ s.diagnosis or "—" }}</div></div>
     <div>
-      <div style="color: var(--muted); font-size: 0.75rem; margin-bottom: 4px">
-        الشكوى
-      </div>
-      <div>{{ s.chief_complaint or "—" }}</div>
+      <div style="color:var(--muted);font-size:.75rem;margin-bottom:4px">💊 الأدوية</div>
+      {% if s.medications %}{% for m in s.medications %}<div>• {{ m.name }}{% if m.dose %} {{ m.dose }}{% endif %}{% if m.frequency %} — {{ m.frequency }}{% endif %}{% if m.duration %} — {{ m.duration }}{% endif %}</div>{% endfor %}{% else %}<div>لا يوجد</div>{% endif %}
     </div>
     <div>
-      <div style="color: var(--muted); font-size: 0.75rem; margin-bottom: 4px">
-        التشخيص
-      </div>
-      <div>{{ s.diagnosis or "—" }}</div>
+      <div style="color:var(--muted);font-size:.75rem;margin-bottom:4px">🔭 الفحوصات</div>
+      {% if s.investigations %}{% for i in s.investigations %}<div>• {{ i.name_ar or i.name }}</div>{% endfor %}{% else %}<div>لا يوجد</div>{% endif %}
     </div>
-    <div>
-      <div style="color: var(--muted); font-size: 0.75rem; margin-bottom: 4px">
-        💊 الأدوية
-      </div>
-      {% if s.medications %} {% for m in s.medications %}
-      <div>
-        • {{ m.name }} {{ m.dose }} — {{ m.frequency }} — {{ m.duration }}
-      </div>
-      {% endfor %} {% else %}
-      <div>لا يوجد</div>
-      {% endif %}
-    </div>
-    <div>
-      <div style="color: var(--muted); font-size: 0.75rem; margin-bottom: 4px">
-        🔭 الفحوصات
-      </div>
-      {% if s.investigations %} {% for i in s.investigations %}
-      <div>• {{ i.name_ar }}</div>
-      {% endfor %} {% else %}
-      <div>لا يوجد</div>
-      {% endif %}
-    </div>
-    <div>
-      <div style="color: var(--muted); font-size: 0.75rem; margin-bottom: 4px">
-        📅 المتابعة
-      </div>
-      <div>بعد {{ s.followup_days or "?" }} يوم</div>
-    </div>
+    <div><div style="color:var(--muted);font-size:.75rem;margin-bottom:4px">📅 المتابعة</div><div>{% if s.followup_days is not none %}بعد {{ s.followup_days }} يوم{% else %}—{% endif %}</div></div>
   </div>
   {% if s.raw_transcription %}
-  <div
-    style="
-      padding: 0 20px 16px;
-      border-top: 1px solid var(--border);
-      margin-top: 4px;
-    "
-  >
-    <div
-      style="
-        color: var(--muted);
-        font-size: 0.75rem;
-        margin-bottom: 6px;
-        margin-top: 12px;
-      "
-    >
-      🎙️ التسجيل الأصلي
-    </div>
-    <div
-      style="
-        background: var(--bg);
-        padding: 10px;
-        border-radius: 6px;
-        font-size: 0.82rem;
-        color: var(--muted);
-      "
-    >
-      {{ s.raw_transcription }}
-    </div>
+  <div style="padding:0 20px 16px;border-top:1px solid var(--border);margin-top:4px">
+    <div style="color:var(--muted);font-size:.75rem;margin:12px 0 6px">🎙️ التسجيل/الملاحظات الأصلية</div>
+    <div style="background:var(--bg);padding:10px;border-radius:6px;font-size:.82rem;color:var(--muted)">{{ s.raw_transcription }}</div>
   </div>
   {% endif %}
 </div>
-{% endfor %} {% else %}
-<div class="card"><div class="empty">لا توجد جلسات لهذا اليوم</div></div>
-{% endif %} {% endblock %}
+{% endfor %}
+{% else %}
+<div class="card"><div class="empty">لا توجد جلسات مسجلة لهذا اليوم</div></div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const appointmentSelect = document.getElementById("appointment_id");
+  const complaintInput = document.getElementById("chief_complaint");
+  const doctorHint = document.getElementById("doctor-hint");
+
+  function updateAppointmentDetails() {
+    const option = appointmentSelect?.selectedOptions?.[0];
+    if (!option || !option.value) {
+      doctorHint.textContent = "";
+      return;
+    }
+    doctorHint.textContent = `سيتم الربط تلقائيًا مع: ${option.dataset.doctor} — ${option.dataset.clinic}`;
+    if (!complaintInput.value) complaintInput.value = option.dataset.complaint || "";
+  }
+  appointmentSelect?.addEventListener("change", updateAppointmentDetails);
+  updateAppointmentDetails();
+
+  document.getElementById("session-form")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const result = document.getElementById("session-result");
+    result.textContent = "جاري الحفظ...";
+    result.style.color = "var(--muted)";
+    const payload = {
+      appointment_id: appointmentSelect.value,
+      chief_complaint: document.getElementById("chief_complaint").value || null,
+      diagnosis: document.getElementById("diagnosis").value || null,
+      medications: document.getElementById("medications").value || null,
+      investigations: document.getElementById("investigations").value || null,
+      followup_days: document.getElementById("followup_days").value ? Number(document.getElementById("followup_days").value) : null,
+      raw_transcription: document.getElementById("raw_transcription").value || null,
+    };
+    try {
+      const response = await fetch("/api/sessions", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "تعذر حفظ الجلسة");
+      result.textContent = "✅ تم حفظ الجلسة وربطها بالمريض والطبيب والموعد.";
+      result.style.color = "var(--p3)";
+      setTimeout(() => window.location.reload(), 700);
+    } catch (error) {
+      result.textContent = `❌ ${error.message}`;
+      result.style.color = "var(--p1)";
+    }
+  });
+</script>
+{% endblock %}

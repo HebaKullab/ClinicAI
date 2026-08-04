@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}الأطباء والعيادات{% endblock %}
+{% block content %}
+<div class="page-title">👨‍⚕️ الأطباء والعيادات</div>
+<div class="page-sub">كل طبيب يمثل عيادة، والـ Slots مرتبطة به مباشرة — {{ display_date }}</div>
+
+<div class="date-nav">
+  <a href="/doctors?day={{ prev_date }}">‹ السابق</a>
+  <span>{{ display_date }}</span>
+  <a href="/doctors?day={{ next_date }}">التالي ›</a>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>رقم الطبيب</th>
+        <th>الطبيب</th>
+        <th>العيادة</th>
+        <th>رمز العيادة</th>
+        <th>التخصص</th>
+        <th>Telegram ID</th>
+        <th>Slots اليوم</th>
+        <th>المتاح</th>
+        <th>المحجوز</th>
+        <th>عرض الجدول</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in summaries %}
+      {% set d = item.doctor %}
+      <tr>
+        <td>#{{ d.doctor_id }}</td>
+        <td>{{ d.name }}</td>
+        <td>{{ d.clinic_name }}</td>
+        <td><span class="badge">{{ d.clinic_code }}</span></td>
+        <td>{{ d.specialty }}</td>
+        <td>{{ d.telegram_id if d.telegram_id else 'اختياري / غير مربوط' }}</td>
+        <td>{{ item.total }}</td>
+        <td class="status-completed">{{ item.available }}</td>
+        <td class="status-confirmed">{{ item.booked }}</td>
+        <td><a class="btn btn-sm" href="/slots?day={{ target_date }}&doctor_id={{ d.doctor_id }}">عرض الـ Slots</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="10" class="empty">لا يوجد أطباء</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
