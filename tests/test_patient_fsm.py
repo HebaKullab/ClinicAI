@@ -670,3 +670,112 @@ def test_cancelled_decline_after_cancel_is_polite():
     reply, _ = unpack_fsm(run_async(fsm.handle("لا ما بدي")))
     assert fsm.state == State.CANCELLED
     assert "تمام" in reply
+
+
+def test_tingling_complaint_and_medium_urgency_offline():
+    """Reproduce Heba transcript: تنميل + متوسط must be captured without LLM."""
+    fsm = PatientFSM(user_id=81021)
+    fsm.state = State.CHATTING
+    unpack_fsm(run_async(fsm.handle("منال")))
+    assert fsm.data.get("name") == "منال"
+    unpack_fsm(run_async(fsm.handle("عندي تنميل خفيف في ايدي")))
+    assert fsm.data.get("complaint")
+    assert "تنميل" in fsm.data["complaint"]["raw"]
+    unpack_fsm(run_async(fsm.handle("متوسط")))
+    assert fsm.data.get("urgency_score") == 0.5
+    reply, _ = unpack_fsm(run_async(fsm.handle("بعد بكرا")))
+    assert fsm.data.get("time_pref")
+    assert fsm.state in (State.CONFIRM, State.FIND_SLOT, State.WAITLISTED, State.CHATTING)
+
+
+@patch("fsm.patient_fsm.gemini")
+def test_confirm_hallucinated_success_triggers_finalize(mock_gemini):
+    """Weaker models say 'تم الحجز' with continue — must still finalize."""
+    from nlp.booking_agent import BookingTurnResult
+    from unittest.mock import AsyncMock
+
+    mock_gemini.is_ready = True
+    mock_gemini.ask = AsyncMock(return_value="")
+
+    fsm = PatientFSM(user_id=81022)
+    fsm.state = State.CONFIRM
+    fsm.data = {
+        "name": "منال",
+        "complaint": {"raw": "تنميل"},
+        "urgency_score": 0.5,
+        "time_pref": {"date": None, "phrase": "بكرا"},
+        "specialty_ar": "طب الأعصاب",
+        "specialty_hint": "neurology",
+    }
+    dt = datetime.utcnow() + timedelta(days=1)
+    fsm.slot = {
+        "slot_id": 999001,
+        "slot_datetime": dt,
+        "doctor_name": "د. لينا",
+        "clinic_name": "عيادة الأعصاب",
+        "clinic_code": "CLINIC-NEURO",
+        "specialty": "neurology",
+        "priority_class": "P2",
+        "doctor_id": 1,
+    }
+    fsm.slot_options = [fsm.slot]
+    fsm.priority = type("P", (), {"priority_class": "P2", "priority_score": 0.5})()
+
+    async def fake_turn(*_a, **_k):
+        return BookingTurnResult(
+            reply="✅ تم تأكيد حجزك وحفظ ملفك في النظام! رقم الحجز: fake_123",
+            intent="continue",
+            extracted={},
+        )
+
+    fsm._ai_turn = fake_turn  # type: ignore[method-assign]
+    fsm._finalize = AsyncMock(return_value={"appointment": type("A", (), {
+        "appt_id": "appt_real_1",
+        "appt_datetime": dt,
+    })()})
+
+    # Neutral clarifying question — does NOT soft-confirm; LLM invents success.
+    reply, _ = unpack_fsm(run_async(fsm.handle("ليش هاد الموعد؟")))
+    assert "تم تأكيد حجزك" in reply
+    assert "appt_real_1" in reply
+    assert "fake_123" not in reply
+    assert fsm.state == State.FINALIZED
+    fsm._finalize.assert_awaited()
+
+
+def test_confirm_munasib_finalizes_without_llm_intent():
+    """Modern models: user says مناسب — rules must book even if LLM would continue."""
+    from unittest.mock import AsyncMock
+
+    fsm = PatientFSM(user_id=81023)
+    fsm.state = State.CONFIRM
+    fsm.data = {
+        "name": "منال",
+        "complaint": {"raw": "تنميل"},
+        "urgency_score": 0.5,
+        "time_pref": {"phrase": "بكرا"},
+        "specialty_ar": "طب الأعصاب",
+        "specialty_hint": "neurology",
+    }
+    dt = datetime.utcnow() + timedelta(days=1)
+    fsm.slot = {
+        "slot_id": 42,
+        "slot_datetime": dt,
+        "doctor_name": "د. لينا",
+        "clinic_name": "عيادة الأعصاب",
+        "clinic_code": "CLINIC-NEURO",
+        "specialty": "neurology",
+        "priority_class": "P2",
+        "doctor_id": 1,
+    }
+    fsm.slot_options = [fsm.slot]
+    fsm.priority = type("P", (), {"priority_class": "P2", "priority_score": 0.5})()
+    fsm._finalize = AsyncMock(return_value={"appointment": type("A", (), {
+        "appt_id": "appt_munasib",
+        "appt_datetime": dt,
+    })()})
+
+    reply, _ = unpack_fsm(run_async(fsm.handle("مناسب")))
+    assert fsm.state == State.FINALIZED
+    assert "appt_munasib" in reply
+    fsm._finalize.assert_awaited()

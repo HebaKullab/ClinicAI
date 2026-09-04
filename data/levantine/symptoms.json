@@ -5,6 +5,12 @@
     "urgency_score": 0.4,
     "specialty": "neurology"
   },
+  "تنميل": {
+    "variants": ["تنميل", "تنميل ايد", "تنميل يد", "خدر", "خدر ايد", "خدر يد"],
+    "category": "neurology",
+    "urgency_score": 0.45,
+    "specialty": "neurology"
+  },
   "سكري": {
     "variants": ["سكري", "سكر", "ضغط سكر"],
     "category": "chronic",

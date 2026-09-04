@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -73,7 +74,42 @@ def _parse_json_response(raw: str) -> dict:
         clean = clean[3:]
     if clean.endswith("```"):
         clean = clean[:-3]
-    return json.loads(clean.strip())
+    clean = clean.strip()
+    try:
+        return json.loads(clean)
+    except json.JSONDecodeError:
+        repaired = _repair_truncated_booking_json(clean)
+        if repaired is not None:
+            return repaired
+        raise
+
+
+def _repair_truncated_booking_json(raw: str) -> dict | None:
+    """Best-effort parse when Gemini truncates mid-JSON (common with 2.5 thinking)."""
+    if not raw or '"reply"' not in raw:
+        return None
+    # Extract reply string even if the closing quote/braces were cut off.
+    m = re.search(r'"reply"\s*:\s*"((?:\\.|[^"\\])*)', raw)
+    reply = ""
+    if m:
+        reply = m.group(1)
+        try:
+            reply = json.loads(f'"{reply}"')
+        except json.JSONDecodeError:
+            reply = reply.replace('\\"', '"').replace("\\n", "\n")
+    intent_m = re.search(r'"intent"\s*:\s*"([a-z_]+)"', raw)
+    intent = intent_m.group(1) if intent_m else "continue"
+    if intent not in VALID_INTENTS:
+        intent = "continue"
+    # Prefer a short usable reply over failing the whole turn.
+    if not reply.strip():
+        return None
+    return {
+        "reply": reply.strip()[:400],
+        "intent": intent,
+        "off_topic": False,
+        "extracted": {"name": None, "complaint": None, "urgency": None, "time_pref": None},
+    }
 
 
 def _urgency_label_to_score(label: str | None) -> float | None:
@@ -141,6 +177,44 @@ def _message_has_urgency_signal(text: str) -> bool:
     return any(t in norm for t in tokens)
 
 
+_COMPLAINT_HINT_WORDS = (
+    "الم", "وجع", "مرض", "صداع", "كحة", "سكري", "شكوى", "عندي",
+    "تنميل", "خدر", "دوخه", "دوخة", "حكه", "حكة", "طفح", "كسر",
+    "نزيف", "حراره", "حرارة", "غثيان", "اقياء", "إقياء", "ضيق",
+    "خفقان", "رعشه", "رعشة", "تورم", "انتفاخ", "مغص", "اسهال",
+)
+
+
+def _message_looks_like_complaint(text: str) -> bool:
+    """Heuristic: symptom-like free text even when not in symptoms.json."""
+    raw = (text or "").strip()
+    if len(raw) < 3:
+        return False
+    if _message_has_urgency_signal(raw) and len(raw.split()) <= 2:
+        return False
+    norm = normalize(raw)
+    if any(w in norm for w in _COMPLAINT_HINT_WORDS):
+        return True
+    # «ايدي / ايدي اليسار / رجلي» alone after short context
+    body = ("ايد", "يد", "رجل", "راس", "بطن", "صدر", "ظهر", "رقبه", "رقبة")
+    return any(w in norm for w in body) and len(norm.split()) >= 2
+
+
+_BOOKING_DONE_MARKERS = (
+    "تم تاكيد حجز", "تم تأكيد حجز", "تم الحجز", "تم حجزك", "تم تثبيت الموعد",
+    "حجزك صار", "الموعد محجوز", "رقم الحجز", "حفظ ملفك في النظام",
+    "سيظهر الموعد تلقائيا", "confirmed your appointment", "booking confirmed",
+)
+
+
+def reply_claims_booking_done(reply: str) -> bool:
+    """True when the LLM invents a successful booking confirmation."""
+    norm = normalize(reply or "")
+    if not norm:
+        return False
+    return any(normalize(m) in norm for m in _BOOKING_DONE_MARKERS)
+
+
 def merge_rule_extracted(user_message: str, collected: dict) -> dict[str, Any]:
     """Rule-based extraction to merge with or replace LLM output."""
     fields = extract_patient_fields(user_message)
@@ -153,9 +227,14 @@ def merge_rule_extracted(user_message: str, collected: dict) -> dict[str, Any]:
 
     if not collected.get("complaint") and fields.get("complaint"):
         out["complaint"] = fields["complaint"].get("raw") or fields["complaint"]
+    elif not collected.get("complaint") and _message_looks_like_complaint(user_message):
+        out["complaint"] = user_message.strip()
 
-    if collected.get("urgency_score") is None and fields.get("urgency_score") is not None:
-        if _message_has_urgency_signal(user_message):
+    if _message_has_urgency_signal(user_message):
+        label_score = _urgency_label_to_score(user_message)
+        if label_score is not None:
+            out["urgency_score"] = label_score
+        elif collected.get("urgency_score") is None and fields.get("urgency_score") is not None:
             out["urgency_score"] = fields["urgency_score"]
 
     tp = fields.get("time_pref") or {}
@@ -190,7 +269,7 @@ def apply_extracted_to_data(
             }
 
     urgency = extracted.get("urgency") or extracted.get("urgency_score")
-    if data.get("urgency_score") is None and urgency is not None:
+    if urgency is not None:
         if isinstance(urgency, (int, float)):
             data["urgency_score"] = float(urgency)
         else:
@@ -316,7 +395,9 @@ def detect_confirm_intent(user_message: str) -> str | None:
         return "decline"
 
     confirm_tokens = (
-        "نعم", "ايوه", "آيوه", "تمام", "ماشي", "موافق", "احجز", "تاكيد", "تأكيد", "اه", "آه", "ايه", "يلا", "ok",
+        "نعم", "ايوه", "آيوه", "تمام", "ماشي", "موافق", "احجز", "تاكيد", "تأكيد",
+        "اه", "آه", "ايه", "يلا", "ok", "اوك", "اوكي", "مناسب", "حاضر", "كويس",
+        "ممتاز", "اكيد", "أكيد", "صح", "ثبت", "خلص", "طيب", "حسنا", "confirm", "sure",
     )
     if any(t in norm for t in confirm_tokens):
         return "confirm"
@@ -426,10 +507,29 @@ async def run_booking_turn(
     intent = (parsed.get("intent") or "continue").strip().lower()
     if intent not in VALID_INTENTS:
         intent = "continue"
-    if rule_intent in VALID_INTENTS and intent == "continue":
+    # Prefer rule intent over a vague LLM "continue" at CONFIRM.
+    if phase == "CONFIRM" and rule_intent in VALID_INTENTS:
+        intent = rule_intent
+    elif rule_intent in VALID_INTENTS and intent == "continue":
         intent = rule_intent
 
+    # Modern/weaker models invent "تم الحجز" without intent=confirm — coerce or strip.
+    if reply_claims_booking_done(reply):
+        if phase == "CONFIRM":
+            intent = "confirm"
+        else:
+            reply = ""
+
     off_topic = bool(parsed.get("off_topic")) or intent == "off_topic"
+    # Never drop medical/urgency extraction on a false off_topic flag.
+    force_extract = (
+        _message_has_urgency_signal(text)
+        or _message_looks_like_complaint(text)
+        or bool(_validate_name(text))
+    )
+    if force_extract:
+        off_topic = False
+
     extracted_raw = parsed.get("extracted") or {}
     if not isinstance(extracted_raw, dict):
         extracted_raw = {}
@@ -446,7 +546,11 @@ async def run_booking_turn(
             extracted["time_pref"] = extracted_raw["time_pref"]
         rule_merge = merge_rule_extracted(text, collected)
         for k, v in rule_merge.items():
-            extracted.setdefault(k, v)
+            # Rule urgency/complaint beat weak LLM nulls; prefer rules when both exist for urgency labels.
+            if k == "urgency_score" and _message_has_urgency_signal(text):
+                extracted[k] = v
+            else:
+                extracted.setdefault(k, v)
 
     if off_topic and not reply:
         first = missing_required_fields(collected, required)

@@ -104,9 +104,12 @@ FIELD_QUESTIONS_AR: dict[str, str] = {
 }
 
 CONFIRM_WORDS = {
-    "نعم", "ايوه", "آيوه", "تمام", "ماشي", "اوك", "yes", "يلا", "احجز",
+    "نعم", "ايوه", "آيوه", "تمام", "ماشي", "اوك", "اوكي", "yes", "يلا", "احجز",
     "تاكيد", "تأكيد", "تاكيد الحجز", "تأكيد الحجز", "موافق", "✅",
-    "اه", "آه", "ايه", "اي", "ايوا", "يب", "ok",
+    "اه", "آه", "ايه", "اي", "ايوا", "يب", "ok", "okay",
+    "مناسب", "مناسبلي", "مناسب لك", "حاضر", "كويس", "ممتاز", "اكيد", "أكيد",
+    "صح", "ثبت", "ثبته", "ثبتلي", "خلص", "طيب", "حسنا", "حسناً", "حسنًا",
+    "اوكيه", "okay", "sure", "confirm",
 }
 CANCEL_WORDS = {"لا", "الغي", "إلغي", "الغاء", "إلغاء", "بدي الغي", "مش حابب", "❌"}
 EDIT_WORDS = {
@@ -148,26 +151,45 @@ def _looks_like_decline(norm: str) -> bool:
 
 
 def _looks_like_soft_confirm(norm: str) -> bool:
-    """Informal Arabic affirmatives — «اه», «بدi موعد اه», emoji confirm buttons."""
+    """Informal Arabic affirmatives — «اه», «بدي موعد اه», emoji confirm buttons."""
     if not norm or _matches_any_token(norm, CANCEL_WORDS):
         return False
     if _looks_like_slot_list_request(norm) or _looks_like_decline(norm):
         return False
-    if any(w in norm for w in ("اشوف", "فرج", "عرض", "شوف", "ورج", "ليش", "لماذا", "كيف")):
+    if any(w in norm for w in ("اشوف", "فرج", "عرض", "شوف", "ورج", "ليش", "لماذا", "كيف", "متى", "وين")):
         return False
+    # Time-change requests are not confirms.
+    if any(w in norm for w in ("ساعه", "ساعة", "الصبح", "العصر", "المساء", "بعد بكرا", "بكرا", "اليوم")):
+        if any(w in norm for w in ("بدي", "غير", "بدل", "عدل", "مو", "مش")):
+            return False
     if _matches_any_token(norm, CONFIRM_WORDS):
         return True
     tokens = _tokenize(norm)
-    if tokens & {"اه", "آه", "ايه", "اي", "ايوا", "يب", "تمام", "ماشي", "اوك", "ok"}:
+    if tokens & {
+        "اه", "آه", "ايه", "اي", "ايوا", "يب", "تمام", "ماشي", "اوك", "اوكي", "ok",
+        "مناسب", "حاضر", "كويس", "ممتاز", "اكيد", "صح", "طيب", "خلص", "ثبت",
+    }:
         return True
     if any(w in norm for w in ("بدي", "بده", "اريد", "حاب", "حابب")):
-        if any(w in norm for w in ("احجز", "حجز", "نعم", "اه", "آه", "موافق", "تمام", "اكد", "أكد")):
+        if any(w in norm for w in ("احجز", "حجز", "نعم", "اه", "آه", "موافق", "تمام", "اكد", "أكد", "ثبت")):
             return True
-        # «بدi موعد» alone is confirm intent; «بدi اشوف مواعيد» excluded above
+        # «بدي موعد» alone is confirm intent; «بدي اشوف مواعيد» excluded above
         if "موعد" in norm and "اشوف" not in norm and "فرج" not in norm:
             return True
     return False
 
+
+def _looks_like_confirm_phase_question(norm: str, raw: str = "") -> bool:
+    """Patient is asking about the offer — do not auto-finalize."""
+    if not norm:
+        return False
+    if (raw or "").strip().endswith(("?", "؟")):
+        return True
+    return any(w in norm for w in (
+        "ليش", "لماذا", "كيف", "وين", "متى", "شو يعني", "ايش يعني", "وضح", "اشرح",
+        "قديش", "كم السعر", "وين العياده", "وين العيادة", "شو صار", "ماذا عن",
+        "هل يمكن", "ممكن اغير", "ممكن أغير",
+    ))
 
 def _is_name_dispute(text: str) -> bool:
     norm = normalize(text or "")
@@ -561,6 +583,10 @@ class PatientFSM:
 
         if self.state == State.CONFIRM:
             reply = turn.reply or self._confirm_nudge()
+            from nlp.booking_agent import reply_claims_booking_done
+
+            if reply_claims_booking_done(reply):
+                return await self._finalize_confirm()
             self.chat_history = append_history(self.chat_history, "assistant", reply)
             return self._reply(reply, UIAction.NONE)
 
@@ -571,6 +597,47 @@ class PatientFSM:
             return self._reply(reply, UIAction.NONE)
 
         return await self._apply_chatting_turn(turn, text)
+
+    def _sanitize_chatting_reply(self, reply: str, user_text: str) -> str:
+        """Replace hallucinated booking confirmations and re-asks for known fields."""
+        from nlp.booking_agent import FIELD_QUESTIONS_AR as AGENT_Q
+        from nlp.booking_agent import reply_claims_booking_done
+
+        text = (reply or "").strip()
+        if reply_claims_booking_done(text):
+            missing = self._missing_fields()
+            if missing:
+                return FIELD_QUESTIONS_AR[missing[0]]
+            return "تمام، خلينا نكمّل. إذا بدك تأكيد موعد موجود قولي نعم بعد ما أعرضه عليك."
+
+        missing = self._missing_fields()
+        if not missing:
+            return text
+
+        next_q = FIELD_QUESTIONS_AR[missing[0]]
+        # If the model re-asks a field we already have, steer to the real gap.
+        already_have_markers = []
+        if self.data.get("name"):
+            already_have_markers.extend([FIELD_QUESTIONS_AR["name"], AGENT_Q["name"], "ما اسمك"])
+        if self.data.get("complaint"):
+            already_have_markers.extend([FIELD_QUESTIONS_AR["complaint"], AGENT_Q["complaint"], "شو الأعراض", "سبب الزيارة"])
+        if self.data.get("urgency_score") is not None:
+            already_have_markers.extend([
+                FIELD_QUESTIONS_AR["urgency_score"], AGENT_Q["urgency_score"],
+                "عاجل / متوسط", "عاجل/متوسط", "مستوى الأولوية",
+            ])
+        if self.data.get("time_pref"):
+            already_have_markers.extend([FIELD_QUESTIONS_AR["time_pref"], AGENT_Q["time_pref"], "متى يناسبك"])
+
+        if any(m in text for m in already_have_markers if m):
+            name = self.data.get("name")
+            if missing[0] == "complaint" and name:
+                return f"أهلاً {name}! 😊\n" + next_q
+            return next_q
+
+        if not text:
+            return next_q
+        return text
 
     async def _handle_collect_specialty(self, text: str) -> tuple[str, UIAction, dict]:
         unsupported = detect_unsupported_specialty(text)
@@ -629,6 +696,9 @@ class PatientFSM:
         if not turn.off_topic:
             apply_extracted_to_data(self.data, turn.extracted, score_from_label=self._score_from_label)
             self._merge_rules_from_message(raw_text)
+        else:
+            # Still absorb clear urgency/complaint even if LLM flagged off_topic.
+            self._merge_rules_from_message(raw_text)
 
         unsupported_msg = self.services.detect_unsupported(raw_text) if raw_text else None
         if unsupported_msg and self.data.get("specialty_method") != "gp_fallback":
@@ -640,6 +710,7 @@ class PatientFSM:
             return self._reply(gp_reply, UIAction.NONE)
 
         reply = turn.reply or fallback_reply(self.data, REQUIRED_FIELDS, raw_text).reply
+        reply = self._sanitize_chatting_reply(reply, raw_text)
         if (
             self.data.get("name")
             and not self.data.get("complaint")
@@ -736,8 +807,9 @@ class PatientFSM:
             if complaint:
                 self.data["complaint"] = complaint
             elif not GeminiClient.looks_like_question(text) and not _is_bot_meta_question(text):
-                norm = normalize(text)
-                if any(w in norm for w in ["الم", "وجع", "مرض", "صداع", "كحة", "سكري", "شكوى", "عندي"]):
+                from nlp.booking_agent import _message_looks_like_complaint
+
+                if _message_looks_like_complaint(text):
                     self.data["complaint"] = {
                         "raw": text.strip(),
                         "category": "general",
@@ -828,7 +900,19 @@ class PatientFSM:
         return self._reply("عفواً، لم أفهم اختيارك. حاول مرة أخرى.")
 
     def _reply(self, text: str, action: UIAction = UIAction.NONE, payload: dict | None = None) -> tuple[str, UIAction, dict]:
-        return text, action, payload or {}
+        """Outbound gate: never claim a booking unless finalize already set FINALIZED."""
+        from nlp.booking_agent import reply_claims_booking_done
+
+        body = text or ""
+        if reply_claims_booking_done(body) and self.state != State.FINALIZED:
+            if self.state == State.CONFIRM and self.slot:
+                body = self._confirm_nudge()
+            elif not self._missing_fields():
+                body = "تمام، لسا بلّش أثبت الموعد بالنظام. رح أعرضلك أقرب وقت متاح."
+            else:
+                missing = self._missing_fields()
+                body = FIELD_QUESTIONS_AR[missing[0]] if missing else self._confirm_nudge()
+        return body, action, payload or {}
 
     # ── Extraction / validation ───────────────────────────────────────────────
 
@@ -978,19 +1062,6 @@ class PatientFSM:
         self.state = State.CONFIRM
         return self._format_confirm_message()
 
-    async def _handle_confirm(self, text: str) -> tuple[str, UIAction, dict]:
-        """Confirm phase — rules first, then single AI turn for natural replies."""
-        rule_result = await self._handle_confirm_rules(text)
-        if rule_result is not None:
-            return rule_result
-        turn = await self._ai_turn(text)
-        intent_result = await self._execute_turn_intent(turn, text)
-        if intent_result is not None:
-            return intent_result
-        reply = turn.reply or self._confirm_nudge()
-        self.chat_history = append_history(self.chat_history, "assistant", reply)
-        return self._reply(reply, UIAction.NONE)
-
     async def _handle_confirm_rules(self, text: str) -> tuple[str, UIAction, dict] | None:
         norm = normalize(text)
         await self._reload_slot_options_if_needed()
@@ -1002,9 +1073,6 @@ class PatientFSM:
         if _looks_like_decline(norm):
             self.state = State.CANCELLED
             return self._reply("تمام، ما في مشكلة — ألغيت الحجز. إذا احتجت شي لاحقاً أنا هون. 👋", UIAction.NONE)
-
-        if _looks_like_soft_confirm(norm):
-            return await self._finalize_confirm()
 
         if _matches_any_token(norm, EDIT_WORDS):
             self.data.pop("time_pref", None)
@@ -1028,8 +1096,44 @@ class PatientFSM:
                 reply, action, payload = self._format_confirm_message()
                 return self._reply(reply + extra, action, payload)
 
+        # Soft / expanded confirms — modern models often skip returning intent=confirm.
+        if _looks_like_soft_confirm(norm):
+            return await self._finalize_confirm()
+
+        # Short non-question replies at CONFIRM default to booking (rules > LLM).
+        # Skip dots/noise — those get an AI nudge instead.
+        if (
+            self.slot
+            and not _is_low_signal_input(text)
+            and not _looks_like_confirm_phase_question(norm, text)
+            and len((text or "").strip()) <= 40
+            and 1 <= len(norm.split()) <= 8
+            and not any(w in norm for w in ("ساعه", "ساعة", "غير", "بدل", "عدل"))
+        ):
+            return await self._finalize_confirm()
+
         return None
 
+    async def _handle_confirm(self, text: str) -> tuple[str, UIAction, dict]:
+        """Confirm phase — rules first; LLM only for clarifying questions."""
+        rule_result = await self._handle_confirm_rules(text)
+        if rule_result is not None:
+            return rule_result
+        turn = await self._ai_turn(text)
+        # Prefer rule/LLM confirm intents — never trust a verbal "تم الحجز" alone.
+        intent_result = await self._execute_turn_intent(turn, text)
+        if intent_result is not None:
+            return intent_result
+        from nlp.booking_agent import reply_claims_booking_done
+
+        if reply_claims_booking_done(turn.reply or ""):
+            return await self._finalize_confirm()
+        # Clarifying question only — keep chatting about the offer.
+        reply = turn.reply or self._confirm_nudge()
+        if reply_claims_booking_done(reply):
+            return await self._finalize_confirm()
+        self.chat_history = append_history(self.chat_history, "assistant", reply)
+        return self._reply(reply, UIAction.NONE)
     async def _cycle_slot_option(self, ai_reply: str | None) -> tuple[str, UIAction, dict]:
         if len(self.slot_options) > 1:
             self.slot_index = (self.slot_index + 1) % len(self.slot_options)

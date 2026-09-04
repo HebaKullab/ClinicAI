@@ -53,15 +53,19 @@ def _match_complaint(text: str, symptoms: dict) -> dict | None:
 
 
 def _score_urgency(text: str, complaint: dict | None) -> float:
+    # Explicit patient priority labels beat symptom baseline.
+    if any(w in text for w in ["عاجل", "طارئ", "فوري", "خطير"]):
+        return 0.9
+    if any(w in text for w in ["متوسط", "عادي"]):
+        return 0.5
+    if any(w in text for w in ["روتيني", "مش عاجل", "اي وقت", "بالراحه"]):
+        return 0.2
+
     base = complaint.get("urgency_score", 0.3) if complaint else 0.3
-    urgent  = ["عاجل", "طارئ", "فوري", "الان", "خطير", "شديد"]
-    routine = ["روتيني", "مش عاجل", "اي وقت", "بالراحه"]
+    urgent = ["شديد", "الان"]
     for w in urgent:
         if w in text:
             base = min(base + 0.2, 1.0)
-    for w in routine:
-        if w in text:
-            base = max(base - 0.2, 0.0)
     return round(base, 2)
 
 

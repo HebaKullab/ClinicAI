@@ -275,14 +275,44 @@ class GeminiClient:
     def _generate_gemini_sync(self, model: str, prompt: str, max_tokens: int) -> str:
         if gemini_client is None or google_types is None:
             raise RuntimeError("Google GenAI client is not configured")
-        response = gemini_client.models.generate_content(
-            model=model,
-            contents=prompt,
-            config=google_types.GenerateContentConfig(
-                system_instruction=SYSTEM_CONTEXT,
-                max_output_tokens=max_tokens,
-            ),
-        )
+
+        # Gemini 2.5 Flash counts "thinking" tokens against max_output_tokens.
+        # Default dynamic thinking often eats the whole budget → truncated JSON mid-string.
+        # Disable thinking for booking turns (faster + complete JSON). Soft-fail if unsupported.
+        config_kwargs: dict = {
+            "system_instruction": SYSTEM_CONTEXT,
+            # Leave headroom even after thinking is off (short replies still need full JSON).
+            "max_output_tokens": max(max_tokens, 1024),
+            "response_mime_type": "application/json",
+        }
+        try:
+            thinking_cfg = google_types.ThinkingConfig(thinking_budget=0)
+            config_kwargs["thinking_config"] = thinking_cfg
+        except Exception:
+            # Older SDK / models that reject ThinkingConfig — continue without it.
+            pass
+
+        try:
+            response = gemini_client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config=google_types.GenerateContentConfig(**config_kwargs),
+            )
+        except Exception as exc:
+            # Some models reject response_mime_type or thinking_config — retry plain config.
+            err = str(exc).lower()
+            if "thinking" in err or "mime" in err or "json" in err or "invalid" in err:
+                logger.warning("Gemini config rejected (%s) — retrying without extras", exc)
+                response = gemini_client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=google_types.GenerateContentConfig(
+                        system_instruction=SYSTEM_CONTEXT,
+                        max_output_tokens=max(max_tokens, 1024),
+                    ),
+                )
+            else:
+                raise
         return (response.text or "").strip()
 
     def _generate_sync(self, model: str, prompt: str, max_tokens: int) -> str:
@@ -481,13 +511,14 @@ class GeminiClient:
             "CHATTING": "اجمع الاسم والشكوى والأولوية ووقت الموعد المفضل.",
             "CONFIRM": (
                 "المريض بمرحلة تأكيد موعد مقترح. حوّل كلامه الطبيعي إلى intent واحد فقط:\n"
-                "- confirm: نعم، تمام، موافق، احجز، يلا\n"
+                "- confirm: نعم، تمام، موافق، احجز، يلا، مناسب، حاضر، طيب، اوكي\n"
                 "- decline: لا، ما بدي، إلغاء\n"
                 "- next_slot: موعد آخر، وقت تاني، بدي أغيره، مش هاد الموعد\n"
                 "- edit_time: تعديل، غير الوقت، بدي موعد بكرا/اليوم\n"
                 "- slot_list: شو المواعيد، فرجيني الخيارات\n"
                 "- cancel: إلغاء الحجز\n"
-                "لا تترك intent=continue إذا النية واضحة."
+                "لا تترك intent=continue إذا النية واضحة.\n"
+                "ممنوع كتابة تم الحجز/رقم الحجز — النظام يحجز بعد confirm فقط."
             ),
             "GP_FALLBACK": "التخصص المطلوب غير متوفر — اعرض الطب العام وافهم موافقة أو رفض.",
             "TERMINAL": "انتهى الحجز السابق — ساعد بالاستعلام أو حجز جديد أو توضيح الحالة.",
@@ -503,7 +534,10 @@ class GeminiClient:
             + f"رسالة المريض: {user_message}\n\n"
             "مهمتك: ردّ طبيعي بالفلسطيني (جملة إلى ثلاث) + تحديد intent + استخراج حقول جديدة.\n"
             "الحجز والأولوية والتصنيف والإلغاء يقررها النظام — أنت تفهم النية والرد فقط.\n"
-            "لا تشخيص طبي. لا أزرار. لا تكرر أسئلة عن معلومات موجودة.\n\n"
+            "لا تشخيص طبي. لا أزرار. لا تكرر أسئلة عن معلومات موجودة.\n"
+            "ممنوع تماماً أن تقول «تم الحجز» أو «تم تأكيد حجزك» أو تعطي رقم حجز — "
+            "التأكيد يتم فقط عبر intent=confirm والنظام ينفّذ الحفظ.\n"
+            "إذا المرحلة CONFIRM والمريض موافق: intent=confirm ورد قصير مثل «لحظة بتأكد الحجز».\n\n"
             "intents: continue, confirm, decline, cancel, accept_gp, reject_gp, inquiry, contact, "
             "new_booking, next_slot, slot_list, edit_time, off_topic\n\n"
             "مهم: intent يحدد العملية التي ينفذها النظام (ليس مجرد رد).\n"
@@ -524,7 +558,7 @@ class GeminiClient:
                 ensure_ascii=False,
             )
         )
-        return await self.ask(prompt, max_tokens=300)
+        return await self.ask(prompt, max_tokens=1024)
 
     async def classify_and_reply(self, complaint_text: str, patient_name: str = "") -> dict:
         """Single LLM call to classify specialty and generate a warm Palestinian Arabic reply simultaneously."""
